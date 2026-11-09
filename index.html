@@ -34,13 +34,45 @@
             border-left: 4px solid #38bdf8;
         }
         .card.process {
-            border-left-color: #a855f7; /* Color morado para diferenciar el proceso */
+            border-left-color: #a855f7;
         }
         h3 { margin-top: 0; color: #f3f4f6; }
         ul, ol { padding-left: 20px; color: #d1d5db; }
         li { margin-bottom: 10px; }
+        
+        /* ZONA DE SUBIDA EXCLUSIVA AL NAS */
+        .upload-zone {
+            background: #1f2937;
+            padding: 25px;
+            border-radius: 8px;
+            border: 2px dashed #38bdf8;
+            max-width: 450px;
+            margin: 30px auto;
+        }
+        .upload-zone p {
+            margin-top: 0;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+        .file-input {
+            color: #9ca3af;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+        
+        /* SECCIÓN SEPARADA PARA ENLACES EXTERNOS */
+        .external-links {
+            margin: 40px auto 10px auto;
+            padding-top: 25px;
+            border-top: 1px solid #1f2937;
+        }
+        .external-links p {
+            color: #9ca3af;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+        }
+        
         .actions {
-            margin-top: 35px;
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -56,13 +88,17 @@
             transition: all 0.2s;
             width: 80%;
             max-width: 300px;
+            box-sizing: border-box;
         }
         .btn-upload {
             background-color: #0284c7;
             color: white;
             box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            border: none;
+            cursor: pointer;
         }
         .btn-upload:hover { background-color: #0369a1; }
+        
         .btn-archive {
             background-color: transparent;
             color: #a855f7;
@@ -87,41 +123,72 @@
     <div class="card">
         <h3>📥 Envío de Observaciones</h3>
         <ul>
-            <li>Formatos aceptados: <strong>.fits, .fit, .fts</strong> (imágenes en bruto).</li>
-            <li>Nomenclatura recomendada: Objeto + Fecha UT (ej: <code>HD172167_20261109.fits</code>).</li>
-            <li>Se requiere la contraseña grupal tras pulsar el botón de subida.</li>
+            <li><strong>Requisito Obligatorio:</strong> Los archivos espectrales (.fits, .fit, .fts) deben ir en carpetas con el formato de siempre (ej :ESPEC_20261031_TOB-7). Las carpetas se deben comprimir en un archivo <strong>.zip</strong>.</li>
+            <li>Se requerirá la contraseña grupal tras verificar el archivo.</li>
         </ul>
     </div>
 
     <!-- BLOQUE 2: PROCESAMIENTO DE LOS DATOS -->
     <div class="card process">
         <h3>⚙️ Flujo de Procesamiento</h3>
-        <p style="color: #9ca3af; font-size: 0.95em; margin-top: -5px;">Una vez subidos los perfiles en bruto al NAS, se realiza el siguiente protocolo:</p>
+        <p style="color: #9ca3af; font-size: 0.95em; margin-top: -5px;">Una vez recibidos los datos empaquetados en el NAS, realizamos el siguiente protocolo:</p>
         <ol>
             <li><strong>Reducción analítica:</strong> Corrección de imágenes mediante tomas de calibración (darks y flats).</li>
-            <li><strong>Extracción del perfil:</strong> Calibración en longitud de onda (habitualmente usando las líneas de Balmer del Hidrógeno) y corrección de la respuesta instrumental.</li>
+            <li><strong>Extracción del perfil:</strong> Calibración en longitud de onda (líneas de Balmer del Hidrógeno) y corrección de la respuesta instrumental.</li>
             <li><strong>Validación de datos:</strong> Control de calidad del perfil espectroscópico final y catalogación de metadatos.</li>
         </ol>
     </div>
 
-    <!-- SECCIÓN DE BOTONES/ACCIONES -->
-    <div class="actions">
-        <!-- ENLACE A TU NAS (Reemplaza la URL de ejemplo por la tuya) -->
-        <a href="https://synology.me" class="btn btn-upload" target="_blank">
-            🚀 Subir al NAS
-        </a>
-        
-        <!-- ENLACE AL ARCHIVO OFICIAL -->
-        <a href="https://sdc.cab.inta-csic.es/sasdaba/" class="btn btn-archive" target="_blank">
-            🔍 Archivo Oficial SASDABA
-        </a>
+    <!-- RECUAUDRO EXCLUSIVO: SUBIDA AL NAS -->
+    <div class="upload-zone">
+        <p>📦 Selector de Archivos para el NAS</p>
+        <input type="file" id="fileChooser" class="file-input" accept=".zip"><br>
+        <div class="actions">
+            <button onclick="validarYSubir()" class="btn btn-upload">
+                🚀 Subir al NAS
+            </button>
+        </div>
+    </div>
+
+    <!-- SECCIÓN INDEPENDIENTE: ENLACE AL ARCHIVO FINAL DEL CSIC -->
+    <div class="external-links">
+        <p>Consulta la base de datos global del proyecto Pro-Am:</p>
+        <div class="actions">
+            <a href="https://sdc.cab.inta-csic.es/sasdaba/" class="btn btn-archive" target="_blank">
+                🔍 Archivo Oficial SASDABA
+            </a>
+        </div>
     </div>
 
     <footer>
         <p>© 2026 SASDABA 2.0. Grupo de observadores colaboradores.</p>
-        <p style="font-size: 0.85em;">Vinculado al proyecto del <a href="https://svo.cab.inta-csic.es" target="_blank">Observatorio Virtual Español (SVO)</a>.</p>
+        <p style="font-size: 0.85em;">Vinculado al proyecto del <a href="https://inta-csic.es/sasdaba/" target="_blank">Observatorio Virtual Español (SVO)</a>.</p>
     </footer>
 </div>
+
+<script>
+function validarYSubir() {
+    const fileInput = document.getElementById('fileChooser');
+    
+    if (fileInput.files.length === 0) {
+        alert("Por favor, selecciona primero el archivo comprimido (.zip) con tus observaciones.");
+        return;
+    }
+    
+    const archivo = fileInput.files[0];
+    
+    if (!archivo.name.toLowerCase().endsWith('.zip')) {
+        alert("¡Acceso denegado! El archivo seleccionado no es un contenedor .zip válido. Por seguridad, empaqueta tus espectros antes de enviarlos.");
+        fileInput.value = ""; 
+        return;
+    }
+    
+    // REEMPLAZA ESTA URL POR TU LINK DE SOLICITUD DE SYNOLOGY
+    const urlSynology = "http://agsantiago.quickconnect.to/sharing/NUN1ZY2te";
+    
+    window.open(urlSynology, "_blank");
+}
+</script>
 
 </body>
 </html>
